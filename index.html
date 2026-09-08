@@ -1,0 +1,1868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#12162a" />
+<title>Goal Getters — Premium Learning Platform</title>
+<style>
+/* ==========================================================================
+   GOAL GETTERS — EDUCATIONAL PLATFORM
+   Design concept: the visual language of an official exam admit card —
+   navy "letterhead" ink, a rubber-stamp amber seal, ticket-stub batch
+   cards with a perforated divider, and an "ACCESS GRANTED" stamp for
+   the unlock moment. Built for a competitive-exam-prep audience that
+   already reads this visual vocabulary every exam season.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  /* ---- color tokens ---- */
+  --ink:          #12162a;   /* deep navy — splash / header band */
+  --ink-2:        #1c2444;   /* secondary navy panel */
+  --ink-3:        #262f56;   /* lighter navy for borders on dark */
+  --paper:        #f6f1e2;   /* warm paper — main background */
+  --paper-2:      #efe6cd;   /* deeper paper — card surface */
+  --paper-line:   #ddd2ac;   /* ruled-line / divider on paper */
+  --amber:        #d99a3d;   /* seal / accent */
+  --amber-light:  #f0c477;
+  --amber-deep:   #a86f22;
+  --stamp-red:    #b1402f;   /* LIVE badge */
+  --ink-text:     #201d17;   /* body text on paper */
+  --ink-text-soft:#6f6858;   /* muted text on paper */
+  --paper-text:   #f3ede0;   /* text on navy */
+  --paper-text-soft: #b9b4c8; /* muted text on navy */
+  --wa-green:     #25d366;
+
+  --radius-card: 18px;
+  --radius-pill: 999px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* , *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--ink);
+  color: var(--ink-text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, .font-display {
+  font-family: 'Lora', Georgia, serif;
+}
+
+button { font-family: inherit; }
+
+a { color: inherit; }
+
+.hidden { display: none !important; }
+
+/* Respect reduced motion globally */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================================================
+   SCREENS — full-viewport steps, one active at a time
+   ========================================================================== */
+
+.screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.6s var(--ease);
+  z-index: 1;
+}
+
+.screen.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  z-index: 5;
+}
+
+.screen:not(.active) * { animation-play-state: paused !important; }
+
+/* ==========================================================================
+   SEAL / LOGO — shared circular emblem used everywhere
+   ========================================================================== */
+
+.seal {
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, var(--amber-light), var(--amber) 55%, var(--amber-deep) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+  font-family: 'Lora', serif;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 3px rgba(18, 22, 42, 0.15);
+}
+
+.seal img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+/* ==========================================================================
+   STEP 1 — SPLASH
+   ========================================================================== */
+
+#screenSplash {
+  background:
+    radial-gradient(ellipse at 50% 20%, rgba(217, 154, 61, 0.18), transparent 60%),
+    var(--ink);
+}
+
+#particlesCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.splash-inner {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 32px;
+}
+
+.splash-seal-wrap {
+  width: 108px;
+  height: 108px;
+  margin: 0 auto 28px;
+  position: relative;
+  opacity: 0;
+  transform: scale(0.4);
+  animation: sealReveal 1s var(--ease) 0.15s forwards;
+}
+
+.splash-seal-wrap .seal { width: 100%; height: 100%; font-size: 40px; }
+
+.splash-seal-wrap::before {
+  content: '';
+  position: absolute;
+  inset: -14px;
+  border-radius: 50%;
+  border: 1px solid rgba(217, 154, 61, 0.5);
+  opacity: 0;
+  animation: ringPulse 2.4s ease-out 1s infinite;
+}
+
+.splash-name {
+  font-size: clamp(26px, 7vw, 34px);
+  font-weight: 700;
+  color: var(--paper-text);
+  letter-spacing: 0.5px;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeUp 0.8s var(--ease) 0.7s forwards;
+}
+
+.splash-tagline {
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--amber-light);
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeUp 0.8s var(--ease) 0.95s forwards;
+}
+
+.splash-rule {
+  width: 46px;
+  height: 2px;
+  background: var(--amber);
+  margin: 18px auto 0;
+  opacity: 0;
+  animation: fadeUp 0.8s var(--ease) 1.1s forwards, ruleGrow 0.8s var(--ease) 1.1s forwards;
+}
+
+.splash-loader {
+  margin-top: 40px;
+  width: 140px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.1);
+  overflow: hidden;
+  margin-left: auto;
+  margin-right: auto;
+  opacity: 0;
+  animation: fadeUp 0.6s ease 1.3s forwards;
+}
+
+.splash-loader::after {
+  content: '';
+  display: block;
+  height: 100%;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, var(--amber), transparent);
+  animation: loaderSlide 1.3s ease-in-out infinite;
+}
+
+@keyframes sealReveal {
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes ringPulse {
+  0% { opacity: 0.6; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.35); }
+}
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes ruleGrow {
+  from { width: 0; }
+  to { width: 46px; }
+}
+@keyframes loaderSlide {
+  0% { transform: translateX(-140px); }
+  100% { transform: translateX(240px); }
+}
+
+/* ==========================================================================
+   STEP 2 — WHATSAPP GATE
+   ========================================================================== */
+
+#screenGate {
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(217, 154, 61, 0.12), transparent 55%),
+    var(--ink);
+  padding: 24px;
+}
+
+.gate-card {
+  width: 100%;
+  max-width: 400px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  border: 1px solid rgba(217, 154, 61, 0.25);
+  border-radius: 22px;
+  padding: 36px 26px 28px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  transform: translateY(18px);
+  animation: fadeUp 0.7s var(--ease) 0.1s forwards;
+}
+
+.gate-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  background: rgba(37, 211, 102, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: gateIconPulse 2.6s ease-in-out infinite;
+}
+
+.gate-icon svg { width: 36px; height: 36px; }
+
+@keyframes gateIconPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.25); }
+  50% { box-shadow: 0 0 0 12px rgba(37, 211, 102, 0); }
+}
+
+.gate-card h1 {
+  font-size: 22px;
+  color: var(--paper-text);
+  margin: 0 0 10px;
+  line-height: 1.35;
+}
+
+.gate-card p {
+  font-size: 14.5px;
+  color: var(--paper-text-soft);
+  line-height: 1.6;
+  margin: 0 0 26px;
+}
+
+.gate-card p strong { color: var(--amber-light); font-weight: 600; }
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  border: none;
+  border-radius: 13px;
+  padding: 15px 18px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease), filter 0.15s var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:active { transform: scale(0.97); }
+
+.btn-whatsapp {
+  background: linear-gradient(135deg, #2fe073, var(--wa-green));
+  color: #06210f;
+  box-shadow: 0 10px 24px -8px rgba(37, 211, 102, 0.5);
+}
+.btn-whatsapp:hover { filter: brightness(1.06); }
+
+.btn-unlock {
+  margin-top: 12px;
+  background: transparent;
+  color: var(--amber-light);
+  border: 1.5px solid rgba(217, 154, 61, 0.55);
+}
+.btn-unlock:hover { background: rgba(217, 154, 61, 0.1); }
+
+.btn-unlock:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.gate-hint {
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--paper-text-soft);
+  opacity: 0.75;
+}
+
+/* ==========================================================================
+   UNLOCK OVERLAY — lock -> stamp animation, plays over the gate screen
+   ========================================================================== */
+
+#unlockOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease;
+}
+#unlockOverlay.active { opacity: 1; visibility: visible; }
+
+.unlock-stage { position: relative; width: 140px; height: 140px; }
+
+.unlock-lock {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.unlock-lock svg { width: 64px; height: 64px; }
+
+.lock-shackle {
+  transform-origin: 50% 70%;
+}
+#unlockOverlay.playing .lock-shackle {
+  animation: shackleOpen 0.5s ease 0.3s forwards;
+}
+
+@keyframes shackleOpen {
+  to { transform: translateY(-6px) rotate(-18deg); }
+}
+
+.unlock-stamp {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(2.2) rotate(-8deg);
+}
+#unlockOverlay.playing .unlock-stamp {
+  animation: stampDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.9s forwards;
+}
+
+.stamp-ring {
+  width: 128px;
+  height: 128px;
+  border-radius: 50%;
+  border: 4px solid var(--amber);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--amber-light);
+  transform: rotate(-8deg);
+}
+.stamp-ring span:first-child {
+  font-family: 'Lora', serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+}
+.stamp-ring span:last-child {
+  font-size: 10px;
+  letter-spacing: 2px;
+  margin-top: 2px;
+  color: var(--paper-text-soft);
+}
+
+@keyframes stampDown {
+  to { opacity: 1; transform: scale(1) rotate(-8deg); }
+}
+
+.unlock-caption {
+  position: absolute;
+  bottom: -44px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 13px;
+  color: var(--paper-text-soft);
+  opacity: 0;
+}
+#unlockOverlay.playing .unlock-caption {
+  animation: fadeUp 0.5s ease 1.3s forwards;
+}
+
+/* ==========================================================================
+   STEP 3 — DASHBOARD
+   ========================================================================== */
+
+#screenDashboard {
+  align-items: flex-start;
+  background: var(--paper);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+#screenSubDashboard {
+  align-items: flex-start;
+  background: var(--paper);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dash-scroll {
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- header band ---- */
+
+.dash-header {
+  background:
+    radial-gradient(ellipse at 80% -20%, rgba(217, 154, 61, 0.25), transparent 55%),
+    linear-gradient(160deg, var(--ink), var(--ink-2));
+  padding: 22px 20px 46px;
+  position: relative;
+}
+
+.dash-header-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dash-header-top .seal {
+  width: 46px;
+  height: 46px;
+  font-size: 17px;
+}
+
+.dash-header-brand { flex: 1; min-width: 0; }
+
+.dash-header-brand .name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--paper-text);
+  line-height: 1.2;
+}
+
+.dash-header-brand .tagline {
+  font-size: 11.5px;
+  color: var(--amber-light);
+  letter-spacing: 0.4px;
+  margin-top: 1px;
+}
+
+.dash-reset-link {
+  font-size: 10.5px;
+  color: var(--paper-text-soft);
+  opacity: 0.55;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: var(--radius-pill);
+  padding: 5px 10px;
+  background: none;
+  cursor: pointer;
+}
+
+.dash-header-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.dash-contact-link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--amber-light);
+  border: 1px solid rgba(217, 154, 61, 0.45);
+  border-radius: var(--radius-pill);
+  padding: 5px 10px 5px 8px;
+  background: rgba(217, 154, 61, 0.08);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.dash-contact-link svg { width: 12px; height: 12px; flex-shrink: 0; }
+.dash-contact-link:active { transform: scale(0.96); }
+
+.dash-greeting {
+  margin-top: 26px;
+}
+
+.dash-greeting h1 {
+  font-size: 25px;
+  color: var(--paper-text);
+  margin: 0;
+  font-weight: 600;
+}
+
+.dash-greeting p {
+  margin: 6px 0 0;
+  font-size: 13.5px;
+  color: var(--paper-text-soft);
+  max-width: 34ch;
+  line-height: 1.5;
+}
+
+/* ---- floating "admit card style" identity strip ---- */
+
+.id-strip {
+  margin: -30px 16px 0;
+  background: var(--paper-2);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 14px 28px -14px rgba(18, 22, 42, 0.45);
+  position: relative;
+  z-index: 2;
+  border: 1px solid var(--paper-line);
+}
+
+.id-strip .stat { text-align: left; }
+.id-strip .stat .n {
+  font-family: 'Lora', serif;
+  font-weight: 700;
+  font-size: 19px;
+  color: var(--ink);
+  display: block;
+}
+.id-strip .stat .l {
+  font-size: 10.5px;
+  color: var(--ink-text-soft);
+  letter-spacing: 0.4px;
+}
+.id-strip .divider {
+  width: 1px;
+  align-self: stretch;
+  background: repeating-linear-gradient(to bottom, var(--paper-line) 0 4px, transparent 4px 8px);
+}
+
+/* ---- content area ---- */
+
+.dash-content {
+  padding: 26px 16px 40px;
+  flex: 1;
+}
+
+.section-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0 0 14px;
+}
+
+.section-heading h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ink-text);
+  margin: 0;
+}
+
+.section-heading .count {
+  font-size: 12.5px;
+  color: var(--ink-text-soft);
+}
+
+/* ---- search ---- */
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--paper-2);
+  border: 1px solid var(--paper-line);
+  border-radius: 13px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+
+.search-bar svg { width: 17px; height: 17px; color: var(--ink-text-soft); flex-shrink: 0; }
+
+.search-bar input {
+  border: none;
+  background: none;
+  outline: none;
+  width: 100%;
+  font-size: 14.5px;
+  color: var(--ink-text);
+  font-family: inherit;
+}
+
+.search-bar input::placeholder { color: var(--ink-text-soft); }
+
+/* ---- filter pills ---- */
+
+.filter-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin-bottom: 20px;
+  scrollbar-width: none;
+}
+.filter-row::-webkit-scrollbar { display: none; }
+
+.filter-pill {
+  flex-shrink: 0;
+  border: 1.5px solid var(--paper-line);
+  background: var(--paper);
+  color: var(--ink-text-soft);
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 8px 15px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+  white-space: nowrap;
+}
+
+.filter-pill.active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper-text);
+}
+
+.filter-pill:active { transform: scale(0.95); }
+
+/* ---- batch cards ---- */
+
+.batch-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.batch-card {
+  background: var(--paper-2);
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(16px);
+  animation: cardIn 0.55s var(--ease) forwards;
+  transition: transform 0.18s var(--ease), box-shadow 0.18s var(--ease);
+}
+
+.batch-card:active { transform: scale(0.985); }
+
+@keyframes cardIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.batch-card-top {
+  display: flex;
+  gap: 13px;
+  padding: 16px 16px 14px;
+}
+
+.batch-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.batch-info { flex: 1; min-width: 0; }
+
+.batch-info-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.batch-name {
+  font-family: 'Lora', serif;
+  font-weight: 600;
+  font-size: 15.5px;
+  color: var(--ink-text);
+  line-height: 1.3;
+}
+
+.batch-badge {
+  flex-shrink: 0;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: #fff;
+  margin-top: 2px;
+}
+.batch-badge.badge-new { background: var(--amber-deep); }
+.batch-badge.badge-live { background: var(--stamp-red); }
+.batch-badge.badge-updated { background: #3a6b52; }
+
+.batch-desc {
+  font-size: 12.5px;
+  color: var(--ink-text-soft);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+.batch-category {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 10.5px;
+  color: var(--ink-text-soft);
+  border: 1px solid var(--paper-line);
+  border-radius: 6px;
+  padding: 2px 7px;
+}
+
+.batch-divider {
+  height: 0;
+  border-top: 1.5px dashed var(--paper-line);
+  margin: 0 16px;
+  position: relative;
+}
+.batch-divider::before, .batch-divider::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--paper);
+}
+.batch-divider::before { left: -24px; }
+.batch-divider::after { right: -24px; }
+
+.batch-action {
+  padding: 12px 16px 16px;
+}
+
+.batch-btn {
+  width: 100%;
+  border: none;
+  border-radius: 11px;
+  background: var(--ink);
+  color: var(--paper-text);
+  font-weight: 700;
+  font-size: 13.5px;
+  padding: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: transform 0.15s var(--ease), background 0.15s var(--ease);
+}
+.batch-btn:active { transform: scale(0.96); }
+.batch-btn svg { width: 14px; height: 14px; }
+
+/* ---- ripple ---- */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.5);
+  transform: scale(0);
+  animation: rippleAnim 0.55s ease-out;
+  pointer-events: none;
+}
+@keyframes rippleAnim {
+  to { transform: scale(3); opacity: 0; }
+}
+.batch-btn, .filter-pill, .btn { position: relative; overflow: hidden; }
+
+/* ---- empty state ---- */
+
+.empty-state {
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--ink-text-soft);
+}
+.empty-state .emoji { font-size: 34px; margin-bottom: 10px; }
+.empty-state p { font-size: 13.5px; margin: 4px 0 0; }
+
+/* ---- footer ---- */
+
+.dash-footer {
+  text-align: center;
+  padding: 18px 20px 30px;
+  font-size: 11.5px;
+  color: var(--ink-text-soft);
+  opacity: 0.7;
+}
+
+/* ==========================================================================
+   RESPONSIVE — keep the phone-app feel, but scale gracefully wider
+   ========================================================================== */
+
+.viewport-frame {
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+@media (min-width: 560px) {
+  #screenDashboard .viewport-frame,
+  #screenSubDashboard .viewport-frame { max-width: 560px; }
+  .batch-grid { display: grid; grid-template-columns: 1fr 1fr; }
+}
+
+@media (min-width: 860px) {
+  #screenDashboard .viewport-frame,
+  #screenSubDashboard .viewport-frame { max-width: 760px; }
+  .batch-grid { grid-template-columns: 1fr 1fr 1fr; }
+}
+
+/* ==========================================================================
+   PERIODIC WHATSAPP REMINDER — full-screen prompt, dashboard only.
+   No lock/unlock animation (that's a one-time-only thing) — just a
+   dismissible full-screen card that fades in and out.
+   ========================================================================== */
+
+.wa-reminder-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 15;
+  background: rgba(10, 12, 22, 0.72);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.4s var(--ease), visibility 0.4s var(--ease);
+}
+
+.wa-reminder-overlay.show {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.wa-reminder-card {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  background: linear-gradient(180deg, #1c2444, #12162a);
+  border: 1px solid rgba(217, 154, 61, 0.3);
+  border-radius: 22px;
+  padding: 36px 26px 28px;
+  text-align: center;
+  transform: translateY(14px) scale(0.97);
+  transition: transform 0.4s var(--ease);
+}
+
+.wa-reminder-overlay.show .wa-reminder-card {
+  transform: translateY(0) scale(1);
+}
+
+.wa-reminder-dismiss {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--paper-text-soft);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   SUB-DASHBOARD — a second full-screen "dashboard" opened when a batch
+   card has nested items (e.g. Maths -> individual VOD/lecture links).
+   Reuses the same visual language as the main dashboard, with a Back
+   button in place of the Reset link.
+   ========================================================================== */
+
+.dash-back-link {
+  font-size: 10.5px;
+  color: var(--paper-text-soft);
+  opacity: 0.85;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: var(--radius-pill);
+  padding: 5px 12px 5px 9px;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.dash-back-link svg { width: 12px; height: 12px; }
+
+</style>
+</head>
+<body>
+
+<!-- ==========================================================================
+     STEP 1 — SPLASH SCREEN
+     ========================================================================== -->
+<section id="screenSplash" class="screen active">
+  <canvas id="particlesCanvas"></canvas>
+  <div class="splash-inner">
+    <div class="splash-seal-wrap">
+      <div class="seal" id="splashSealMount"><!-- logo mounted by script.js --></div>
+    </div>
+    <h1 class="splash-name" id="splashName">Goal Getters</h1>
+    <div class="splash-tagline" id="splashTagline">YOUR SUCCESS, OUR MISSION</div>
+    <div class="splash-rule"></div>
+    <div class="splash-loader"></div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     STEP 2 — WHATSAPP JOIN GATE
+     ========================================================================== -->
+<section id="screenGate" class="screen">
+  <div class="gate-card">
+    <div class="gate-icon">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17.6 6.32A8.86 8.86 0 0 0 3.06 16.66L2 21l4.44-1.03a8.86 8.86 0 0 0 12.6-11.66h-1.44Z" fill="#25D366"/>
+        <path d="M12 3.2a8.8 8.8 0 0 0-7.55 13.3L3.2 20.8l4.4-1.15A8.8 8.8 0 1 0 12 3.2Zm4.94 12.55c-.21.6-1.22 1.15-1.68 1.2-.43.05-.87.22-2.93-.62-2.46-1.02-4.05-3.54-4.17-3.7-.12-.16-1-1.32-1-2.52s.62-1.78.84-2.02c.21-.24.46-.3.62-.3.16 0 .31 0 .45.01.14.01.34-.05.53.4.21.5.7 1.73.76 1.86.06.13.1.28.02.45-.08.16-.13.27-.25.42-.13.14-.27.32-.38.43-.13.13-.26.26-.11.51.15.26.68 1.12 1.46 1.81 1 .89 1.85 1.16 2.11 1.29.26.13.41.11.56-.06.16-.18.65-.76.82-1.02.17-.26.34-.22.57-.13.23.08 1.46.69 1.71.82.26.13.43.19.49.3.06.11.06.63-.15 1.23Z" fill="#12162A"/>
+      </svg>
+    </div>
+    <h1>Join Our WhatsApp Community</h1>
+    <p>Access to all batches, updates and study material is shared through our WhatsApp community. Please join before unlocking your dashboard — it only takes a moment.</p>
+    <button class="btn btn-whatsapp" id="joinWhatsappBtn">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none"><path d="M12 3.2a8.8 8.8 0 0 0-7.55 13.3L3.2 20.8l4.4-1.15A8.8 8.8 0 1 0 12 3.2Z" fill="#0b3d1e"/></svg>
+      JOIN WHATSAPP
+    </button>
+    <button class="btn btn-unlock" id="unlockBtn" disabled>I HAVE JOINED — UNLOCK ACCESS</button>
+    <div class="gate-hint" id="gateHint">Tap "Join WhatsApp" first — unlock activates once you return.</div>
+  </div>
+</section>
+
+<!-- Unlock transition overlay (lock -> stamp) -->
+<div id="unlockOverlay">
+  <div class="unlock-stage">
+    <div class="unlock-lock">
+      <svg viewBox="0 0 24 24" fill="none">
+        <g class="lock-shackle"><path d="M7 10V7a5 5 0 0 1 10 0v3" stroke="#d99a3d" stroke-width="1.8" stroke-linecap="round"/></g>
+        <rect x="5" y="10" width="14" height="10" rx="2.5" fill="#d99a3d"/>
+        <circle cx="12" cy="15" r="1.6" fill="#12162a"/>
+      </svg>
+    </div>
+    <div class="unlock-stamp">
+      <div class="stamp-ring">
+        <span>ACCESS</span>
+        <span>GRANTED</span>
+      </div>
+    </div>
+    <div class="unlock-caption">Unlocking your dashboard…</div>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     STEP 3 — MAIN DASHBOARD
+     ========================================================================== -->
+<section id="screenDashboard" class="screen">
+  <div class="viewport-frame">
+    <div class="dash-scroll">
+
+      <header class="dash-header">
+        <div class="dash-header-top">
+          <div class="seal" id="dashSealMount"></div>
+          <div class="dash-header-brand">
+            <div class="name" id="dashBrandName">Goal Getters</div>
+            <div class="tagline" id="dashBrandTagline">YOUR SUCCESS, OUR MISSION</div>
+          </div>
+          <div class="dash-header-actions">
+            <button class="dash-contact-link" id="contactAdminBtn" title="Contact Admin">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M21.5 3.5 2.5 11l6.2 2.3L11 20l3.2-4.3L20 18Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+              Contact Admin
+            </button>
+            <button class="dash-reset-link" id="devResetBtn" title="Developer option: clears the unlock flag for testing">Reset</button>
+          </div>
+        </div>
+        <div class="dash-greeting">
+          <h1 id="greetingText">Welcome Back 👋</h1>
+          <p id="greetingSubtitle">Pick up where you left off — your next batch is one tap away.</p>
+        </div>
+      </header>
+
+      <div class="id-strip">
+        <div class="stat">
+          <span class="n" id="statTotalBatches">0</span>
+          <span class="l">Batches</span>
+        </div>
+        <div class="divider"></div>
+        <div class="stat">
+          <span class="n" id="statCategories">0</span>
+          <span class="l">Categories</span>
+        </div>
+        <div class="divider"></div>
+        <div class="stat">
+          <span class="n" id="statLive">0</span>
+          <span class="l">Live now</span>
+        </div>
+      </div>
+
+      <main class="dash-content">
+        <div class="section-heading">
+          <h2>📚 Available Batches</h2>
+          <span class="count" id="batchCountLabel"></span>
+        </div>
+
+        <div class="search-bar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="searchInput" placeholder="Search batches…" autocomplete="off" />
+        </div>
+
+        <div class="filter-row" id="filterRow"></div>
+
+        <div class="batch-grid" id="batchGrid"></div>
+
+        <div class="empty-state hidden" id="emptyState">
+          <div class="emoji">🔍</div>
+          <p>No batches match your search.<br>Try a different keyword or category.</p>
+        </div>
+      </main>
+
+      <footer class="dash-footer">
+        You're all set — new batches appear here automatically.
+      </footer>
+
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     SUB-DASHBOARD — opened when a batch card has nested items (e.g.
+     Maths -> individual VOD/lecture links) instead of a single URL.
+     Same look as the main dashboard, with a Back button.
+     ========================================================================== -->
+<section id="screenSubDashboard" class="screen">
+  <div class="viewport-frame">
+    <div class="dash-scroll">
+
+      <header class="dash-header">
+        <div class="dash-header-top">
+          <div class="batch-icon" id="subBatchIcon" style="width:46px;height:46px;font-size:20px;">📘</div>
+          <div class="dash-header-brand">
+            <div class="name" id="subBatchName">Batch</div>
+            <div class="tagline" id="subBatchTagline">SECTIONS</div>
+          </div>
+          <div class="dash-header-actions">
+            <button class="dash-contact-link" id="subContactAdminBtn" title="Contact Admin">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M21.5 3.5 2.5 11l6.2 2.3L11 20l3.2-4.3L20 18Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+              Contact Admin
+            </button>
+            <button class="dash-back-link" id="subBackBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 6 9 12l6 6"/></svg>
+              Back
+            </button>
+          </div>
+        </div>
+        <div class="dash-greeting">
+          <h1 id="subGreetingText">Available Sections</h1>
+          <p id="subGreetingSubtitle">Tap a section below to open it.</p>
+        </div>
+      </header>
+
+      <main class="dash-content" style="padding-top: 22px;">
+        <div class="batch-grid" id="subBatchGrid"></div>
+      </main>
+
+      <footer class="dash-footer">
+        Tap Back to return to the main dashboard.
+      </footer>
+
+    </div>
+  </div>
+</section>
+
+<!-- Lightweight periodic WhatsApp reminder — full-screen prompt shown
+     from time to time on the dashboard. Unlike the first-time gate,
+     this has no lock/unlock animation and can be dismissed to go
+     straight back to the dashboard. -->
+<div id="waReminder" class="wa-reminder-overlay">
+  <div class="wa-reminder-card">
+    <button class="wa-reminder-dismiss" id="waReminderClose" aria-label="Dismiss">✕</button>
+    <div class="gate-icon">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17.6 6.32A8.86 8.86 0 0 0 3.06 16.66L2 21l4.44-1.03a8.86 8.86 0 0 0 12.6-11.66h-1.44Z" fill="#25D366"/>
+        <path d="M12 3.2a8.8 8.8 0 0 0-7.55 13.3L3.2 20.8l4.4-1.15A8.8 8.8 0 1 0 12 3.2Zm4.94 12.55c-.21.6-1.22 1.15-1.68 1.2-.43.05-.87.22-2.93-.62-2.46-1.02-4.05-3.54-4.17-3.7-.12-.16-1-1.32-1-2.52s.62-1.78.84-2.02c.21-.24.46-.3.62-.3.16 0 .31 0 .45.01.14.01.34-.05.53.4.21.5.7 1.73.76 1.86.06.13.1.28.02.45-.08.16-.13.27-.25.42-.13.14-.27.32-.38.43-.13.13-.26.26-.11.51.15.26.68 1.12 1.46 1.81 1 .89 1.85 1.16 2.11 1.29.26.13.41.11.56-.06.16-.18.65-.76.82-1.02.17-.26.34-.22.57-.13.23.08 1.46.69 1.71.82.26.13.43.19.49.3.06.11.06.63-.15 1.23Z" fill="#12162A"/>
+      </svg>
+    </div>
+    <h1>Haven't Joined Yet?</h1>
+    <p>Don't miss batch updates, live class alerts and announcements — join our WhatsApp community now.</p>
+    <button class="btn btn-whatsapp" id="waReminderJoin">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none"><path d="M12 3.2a8.8 8.8 0 0 0-7.55 13.3L3.2 20.8l4.4-1.15A8.8 8.8 0 1 0 12 3.2Z" fill="#0b3d1e"/></svg>
+      JOIN WHATSAPP
+    </button>
+    <button class="btn btn-unlock" id="waReminderLater">MAYBE LATER</button>
+  </div>
+</div>
+
+<script defer>
+/* ==========================================================================
+   GOAL GETTERS — MAIN SCRIPT
+   Everything you need to customise lives in the CONFIG block below.
+   The UI code beneath it never needs to change when you add batches,
+   swap the logo, or update links.
+   ========================================================================== */
+
+/* ============================================================
+   1. CONFIG — edit this section, leave the rest alone
+   ============================================================ */
+const CONFIG = {
+
+  // ---- Brand ----
+  platformName: "Goal Getters",
+  tagline: "YOUR SUCCESS, OUR MISSION",
+
+  // Path to your logo image, or a data URL. Leave as null to use the
+  // built-in placeholder emblem instead.
+  // Example once you have a logo file: logoSrc: "assets/logo.png"
+  logoSrc: "data:image/jpeg;base64,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",
+
+  // ---- WhatsApp ----
+  // Replace with your actual WhatsApp community/channel/group link.
+  whatsappUrl: "https://whatsapp.com/channel/0029VbCJQjnHAdNUh7epwp2V",
+
+  // ---- Contact Admin ----
+  // Shown as a small button in the top-right corner of every
+  // dashboard screen — opens this link (e.g. a Telegram bot/DM).
+  adminContactUrl: "https://t.me/Goalgetters935_bot",
+
+  // Periodic reminder shown on the dashboard (full-screen prompt,
+  // dismissible) — the lock/unlock animation only ever plays once,
+  // on the very first visit. This just nudges people who skipped it.
+  reminder: {
+    enabled: true,
+    everySeconds: 90   // how often it can pop up
+  },
+
+  // ---- Filter categories ----
+  // These are the fixed category pills shown on the dashboard
+  // (besides "All"). Give each batch below a category matching
+  // one of these names.
+  categories: ["Batches", "Others", "Website"],
+
+  // ---- Batches ----
+  // Add a new batch by adding another object to this array — the
+  // dashboard, search, filters and cards all update automatically.
+  // badge is optional: "NEW" | "LIVE" | "UPDATED" | "" (or omit it)
+  //
+  // Every batch below opens its own SUB-DASHBOARD (same look as the
+  // main dashboard) instead of a direct link — tapping the batch
+  // card shows its "items" list, and tapping an item opens that
+  // item's link. To add a lecture/section to a batch, just add a
+  // new object to its "items" array:
+  //   { name: "1 Aditya ranjan vod 3", url: "https://..." }
+  // Leave "items" as an empty array [] until you have links ready —
+  // the sub-dashboard will just show an empty state until then.
+  batches: [
+    {
+      name: "Maths",
+      description: "Complete Maths batch covering concepts, shortcuts and practice sets for competitive exams.",
+      category: "Batches",
+      badge: "LIVE",
+      icon: "📐",
+      items: [
+        {
+          name: "1 Aditya ranjan vod 3",
+          url: "https://goalgettersofficial93-cell.github.io/Aditya-ranjan-vod-3/"
+        },
+        {
+          name: "Rakesh yadav",
+          url: "https://goalgettersofficial93-cell.github.io/Rakesh-yadav/"
+        },
+        {
+          name: "Ultra calci",
+          url: "https://goalgettersofficial93-cell.github.io/Ultra-calci-3.0/"
+        },
+        {
+          name: "Maths mania",
+          url: "https://goalgettersofficial93-cell.github.io/Maths-mania-/"
+        },
+        {
+          name: "Super 100",
+          url: "https://goalgettersofficial93-cell.github.io/Super-100/"
+        },
+        {
+          name: "Spartan foundation",
+          url: "https://goalgettersofficial93-cell.github.io/Spartan-foundation-/"
+        },
+        {
+          name: "Bhutesh foundation",
+          url: "https://goalgettersofficial93-cell.github.io/Bhutesh-sir-foundation-/"
+        }
+      ]
+    },
+    {
+      name: "English",
+      description: "Grammar, vocabulary and comprehension batch built for exam-level English sections.",
+      category: "Batches",
+      badge: "",
+      icon: "📖",
+      items: [
+        {
+          name: "Rani mam 8.0",
+          url: "https://goalgettersofficial93-cell.github.io/Rani-mam-8.0/"
+        },
+        {
+          name: "Neetu mam",
+          url: "https://goalgettersofficial93-cell.github.io/Neetu-mam/"
+        }
+      ]
+    },
+    {
+      name: "GK",
+      description: "General Knowledge batch covering current affairs and static GK for every exam.",
+      category: "Batches",
+      badge: "NEW",
+      icon: "🌍",
+      items: [
+        {
+          name: "Parmar 4.0",
+          url: "https://goalgettersofficial93-cell.github.io/Parmar-4.0/"
+        }
+      ]
+    },
+    {
+      name: "Reasoning",
+      description: "Logical and analytical reasoning batch with daily practice and shortcut tricks.",
+      category: "Batches",
+      badge: "",
+      icon: "🧩",
+      items: [
+        {
+          name: "Arun sir",
+          url: "https://goalgettersofficial93-cell.github.io/Arun-sir/"
+        }
+      ]
+    },
+    {
+      name: "Goal Getters",
+      description: "Our flagship all-in-one batch bringing every subject together under one roof.",
+      category: "Batches",
+      badge: "UPDATED",
+      icon: "🎯",
+      items: [
+        {
+          name: "Goal getters official",
+          url: "https://t.me/goalgetters1122"
+        },
+        {
+          name: "Youtube chennal",
+          url: "https://youtube.com/@gyanvat-m3x?si=Z_siM7aKNdaJ8s0p"
+        },
+        {
+          name: "Whatsapp chennal",
+          url: "https://whatsapp.com/channel/0029VbCJQjnHAdNUh7epwp2V"
+        },
+        {
+          name: "Doubt group",
+          url: "https://t.me/goalgettersdoubt"
+        }
+      ]
+    },
+    {
+      name: "Banking",
+      description: "Banking exam batch covering quant, reasoning, English and awareness for bank exams.",
+      category: "Batches",
+      badge: "NEW",
+      icon: "🏦",
+      items: [
+        {
+          name: "Banking spl-40",
+          url: "https://goalgettersofficial93-cell.github.io/Banking-spl-40-/"
+        },
+        {
+          name: "Banking mock test",
+          url: "https://goalgettersofficial93-cell.github.io/Banking-mocks/"
+        }
+      ]
+    },
+    {
+      name: "Science",
+      description: "Science batch covering Physics, Chemistry and Biology basics for competitive exams.",
+      category: "Others",
+      badge: "NEW",
+      icon: "🔬",
+      items: [
+        {
+          name: "Nirman batch",
+          url: "https://goalgettersofficial93-cell.github.io/Nirman-batch-2026/"
+        }
+      ]
+    },
+    {
+      name: "Pratham batch",
+      description: "Pratham batch — additional resources and study material.",
+      category: "Others",
+      badge: "NEW",
+      icon: "📕",
+      items: [
+        {
+          name: "Pratham batch",
+          url: "https://goalgettersofficial93-cell.github.io/Pratham-batch-/"
+        }
+      ]
+    },
+    {
+      name: "Official Website",
+      description: "Visit our official website for resources, announcements and everything Goal Getters.",
+      category: "Website",
+      badge: "",
+      icon: "🌐",
+      items: [
+        {
+          name: "Cds",
+          url: "https://goalgettersofficial93-cell.github.io/Cds-batches/"
+        },
+        {
+          name: "Upsc ias",
+          url: "https://goalgettersofficial93-cell.github.io/Upsc-ias/"
+        },
+        {
+          name: "Selection way",
+          url: "https://goalgettersofficial93-cell.github.io/Selection-way-/"
+        }
+      ]
+    }
+  ]
+};
+
+/* ============================================================
+   2. STORAGE — remembers the WhatsApp unlock on this device
+   ============================================================ */
+const STORAGE_KEY = "ggUnlockState";
+
+const Storage = {
+  isUnlocked() {
+    return localStorage.getItem(STORAGE_KEY) === "true";
+  },
+  setUnlocked() {
+    localStorage.setItem(STORAGE_KEY, "true");
+  },
+  reset() {
+    localStorage.removeItem(STORAGE_KEY);
+  }
+};
+
+/* ============================================================
+   3. SCREEN HELPERS
+   ============================================================ */
+function $(id) { return document.getElementById(id); }
+
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  $(id).classList.add("active");
+}
+
+/* ============================================================
+   4. LOGO / SEAL MOUNTING
+   ============================================================ */
+// Default emblem used until a real logo image is supplied via
+// CONFIG.logoSrc — a graduation-cap mark inside the seal, so the
+// placeholder still reads as a proper logo rather than bare initials.
+const DEFAULT_LOGO_SVG = `
+<svg viewBox="0 0 48 48" width="62%" height="62%" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M24 6 45 15 24 24 3 15Z" fill="#12162a"/>
+  <path d="M13 19.5V29c0 3 5 6 11 6s11-3 11-6v-9.5" stroke="#12162a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M42 16.5v10" stroke="#12162a" stroke-width="2.4" stroke-linecap="round"/>
+  <circle cx="42" cy="30" r="2" fill="#12162a"/>
+</svg>`;
+
+function mountLogo(container) {
+  container.innerHTML = "";
+  if (CONFIG.logoSrc) {
+    const img = document.createElement("img");
+    img.src = CONFIG.logoSrc;
+    img.alt = CONFIG.platformName + " logo";
+    container.appendChild(img);
+  } else {
+    container.innerHTML = DEFAULT_LOGO_SVG;
+  }
+}
+
+/* ============================================================
+   5. RIPPLE EFFECT (mobile tap feedback)
+   ============================================================ */
+function attachRipple(el) {
+  el.addEventListener("click", function (e) {
+    const rect = el.getBoundingClientRect();
+    const ripple = document.createElement("span");
+    const size = Math.max(rect.width, rect.height);
+    ripple.className = "ripple";
+    ripple.style.width = ripple.style.height = size + "px";
+    ripple.style.left = (e.clientX - rect.left - size / 2) + "px";
+    ripple.style.top = (e.clientY - rect.top - size / 2) + "px";
+    el.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 600);
+  });
+}
+
+/* ============================================================
+   6. PARTICLE BACKGROUND (splash screen only)
+   ============================================================ */
+function initParticles() {
+  const canvas = $("particlesCanvas");
+  const ctx = canvas.getContext("2d");
+  let w, h, particles = [];
+  const COUNT = 46;
+
+  function resize() {
+    w = canvas.width = canvas.offsetWidth;
+    h = canvas.height = canvas.offsetHeight;
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  function makeParticle() {
+    return {
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: Math.random() * 1.6 + 0.4,
+      vy: -(Math.random() * 0.25 + 0.05),
+      vx: (Math.random() - 0.5) * 0.15,
+      o: Math.random() * 0.5 + 0.15
+    };
+  }
+  for (let i = 0; i < COUNT; i++) particles.push(makeParticle());
+
+  let rafId = null;
+  function animate() {
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.y < -5) { p.y = h + 5; p.x = Math.random() * w; }
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(217, 154, 61, ${p.o})`;
+      ctx.fill();
+    });
+    rafId = requestAnimationFrame(animate);
+  }
+  animate();
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) { cancelAnimationFrame(rafId); }
+    else { animate(); }
+  });
+}
+
+/* ============================================================
+   7. DASHBOARD — greeting
+   ============================================================ */
+function setGreeting() {
+  const hour = new Date().getHours();
+  let greet = "Welcome Back";
+  if (hour >= 5 && hour < 12) greet = "Good Morning";
+  else if (hour >= 12 && hour < 17) greet = "Good Afternoon";
+  else if (hour >= 17 && hour < 21) greet = "Good Evening";
+  // Late night (9pm–5am) skips a time-of-day label entirely — a lot
+  // of exam prep happens at night, and "Good Evening" at 2am reads
+  // wrong. "Welcome Back" works at any hour.
+  $("greetingText").textContent = `${greet} 👋`;
+}
+
+/* ============================================================
+   8. DASHBOARD — batch rendering, search & filter
+   ============================================================ */
+let activeCategory = "All";
+let searchTerm = "";
+
+function badgeClass(badge) {
+  const key = (badge || "").toLowerCase();
+  if (key === "new") return "badge-new";
+  if (key === "live") return "badge-live";
+  if (key === "updated") return "badge-updated";
+  return "";
+}
+
+function renderStats() {
+  $("statTotalBatches").textContent = CONFIG.batches.length;
+  $("statCategories").textContent = CONFIG.categories.length;
+  $("statLive").textContent = CONFIG.batches.filter(b => (b.badge || "").toLowerCase() === "live").length;
+}
+
+function renderFilters() {
+  const cats = ["All", ...CONFIG.categories];
+  const row = $("filterRow");
+  row.innerHTML = "";
+  cats.forEach(cat => {
+    const btn = document.createElement("button");
+    btn.className = "filter-pill" + (cat === activeCategory ? " active" : "");
+    btn.textContent = cat;
+    btn.addEventListener("click", () => {
+      activeCategory = cat;
+      renderFilters();
+      renderBatches();
+    });
+    attachRipple(btn);
+    row.appendChild(btn);
+  });
+}
+
+function matchesFilters(batch) {
+  const inCategory = activeCategory === "All" || batch.category === activeCategory;
+  const term = searchTerm.trim().toLowerCase();
+  const inSearch = !term ||
+    batch.name.toLowerCase().includes(term) ||
+    batch.description.toLowerCase().includes(term) ||
+    batch.category.toLowerCase().includes(term);
+  return inCategory && inSearch;
+}
+
+function renderBatches() {
+  const grid = $("batchGrid");
+  const empty = $("emptyState");
+  const filtered = CONFIG.batches.filter(matchesFilters);
+
+  $("batchCountLabel").textContent = `${filtered.length} of ${CONFIG.batches.length}`;
+
+  grid.innerHTML = "";
+  if (filtered.length === 0) {
+    empty.classList.remove("hidden");
+    return;
+  }
+  empty.classList.add("hidden");
+
+  filtered.forEach((batch, i) => {
+    const card = document.createElement("div");
+    card.className = "batch-card";
+    card.style.animationDelay = (i * 0.06) + "s";
+
+    const badge = batch.badge
+      ? `<span class="batch-badge ${badgeClass(batch.badge)}">${batch.badge}</span>`
+      : "";
+
+    card.innerHTML = `
+      <div class="batch-card-top">
+        <div class="batch-icon">${batch.icon || "📘"}</div>
+        <div class="batch-info">
+          <div class="batch-info-head">
+            <div class="batch-name">${batch.name}</div>
+            ${badge}
+          </div>
+          <div class="batch-desc">${batch.description}</div>
+          <span class="batch-category">${batch.category}</span>
+        </div>
+      </div>
+      <div class="batch-divider"></div>
+      <div class="batch-action">
+        <button class="batch-btn" type="button">
+          OPEN BATCH
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 17 17 7M9 7h8v8"/></svg>
+        </button>
+      </div>
+    `;
+
+    const openBtn = card.querySelector(".batch-btn");
+    attachRipple(openBtn);
+    openBtn.addEventListener("click", () => {
+      if (batch.items) {
+        openSubDashboard(batch);
+      } else {
+        window.open(batch.url, "_blank", "noopener");
+      }
+    });
+
+    grid.appendChild(card);
+  });
+}
+
+/* ============================================================
+   8b. SUB-DASHBOARD — full screen list of a batch's nested items
+   ============================================================ */
+function openSubDashboard(batch) {
+  $("subBatchIcon").textContent = batch.icon || "📘";
+  $("subBatchName").textContent = batch.name;
+  $("subBatchTagline").textContent = CONFIG.tagline;
+  $("subGreetingText").textContent = batch.name;
+  $("subGreetingSubtitle").textContent = batch.items.length
+    ? `${batch.items.length} section${batch.items.length === 1 ? "" : "s"} available — tap one to open it.`
+    : "Sections will appear here soon.";
+
+  const grid = $("subBatchGrid");
+  grid.innerHTML = "";
+
+  if (batch.items.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state" style="grid-column: 1 / -1;">
+        <div class="emoji">🗂️</div>
+        <p>No sections added yet.<br>Check back soon.</p>
+      </div>
+    `;
+    showScreen("screenSubDashboard");
+    return;
+  }
+
+  batch.items.forEach((item, i) => {
+    const card = document.createElement("div");
+    card.className = "batch-card";
+    card.style.animationDelay = (i * 0.06) + "s";
+
+    const badge = item.badge
+      ? `<span class="batch-badge ${badgeClass(item.badge)}">${item.badge}</span>`
+      : "";
+
+    card.innerHTML = `
+      <div class="batch-card-top">
+        <div class="batch-icon">${item.icon || "▶️"}</div>
+        <div class="batch-info">
+          <div class="batch-info-head">
+            <div class="batch-name">${item.name}</div>
+            ${badge}
+          </div>
+          ${item.description ? `<div class="batch-desc">${item.description}</div>` : ""}
+        </div>
+      </div>
+      <div class="batch-divider"></div>
+      <div class="batch-action">
+        <button class="batch-btn" type="button">
+          OPEN
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 17 17 7M9 7h8v8"/></svg>
+        </button>
+      </div>
+    `;
+
+    const openBtn = card.querySelector(".batch-btn");
+    attachRipple(openBtn);
+    openBtn.addEventListener("click", () => {
+      window.open(item.url, "_blank", "noopener");
+    });
+
+    grid.appendChild(card);
+  });
+
+  showScreen("screenSubDashboard");
+}
+
+function initSubDashboard() {
+  $("subBackBtn").addEventListener("click", () => {
+    showScreen("screenDashboard");
+  });
+}
+
+function initContactAdmin() {
+  [$("contactAdminBtn"), $("subContactAdminBtn")].forEach(btn => {
+    attachRipple(btn);
+    btn.addEventListener("click", () => {
+      window.open(CONFIG.adminContactUrl, "_blank", "noopener");
+    });
+  });
+}
+
+function initSearchAndFilters() {
+  renderStats();
+  renderFilters();
+  renderBatches();
+  $("searchInput").addEventListener("input", (e) => {
+    searchTerm = e.target.value;
+    renderBatches();
+  });
+}
+
+/* ============================================================
+   9. FLOW — splash -> gate -> unlock -> dashboard
+   ============================================================ */
+function enterDashboard() {
+  mountLogo($("dashSealMount"));
+  $("dashBrandName").textContent = CONFIG.platformName;
+  $("dashBrandTagline").textContent = CONFIG.tagline;
+  setGreeting();
+  initSearchAndFilters();
+  initWaReminder();
+  showScreen("screenDashboard");
+}
+
+function playUnlockAnimation() {
+  const overlay = $("unlockOverlay");
+  overlay.classList.add("active");
+  // trigger the internal keyframes on the next frame
+  requestAnimationFrame(() => overlay.classList.add("playing"));
+
+  setTimeout(() => {
+    Storage.setUnlocked();
+    overlay.classList.remove("playing");
+    overlay.classList.remove("active");
+    enterDashboard();
+  }, 1900);
+}
+
+function initGate() {
+  let hasClickedJoin = false;
+  let returnedFromWhatsapp = false;
+
+  function enableUnlock() {
+    const btn = $("unlockBtn");
+    btn.disabled = false;
+    $("gateHint").textContent = "Welcome back! Tap the button above to unlock.";
+  }
+
+  $("joinWhatsappBtn").addEventListener("click", () => {
+    window.open(CONFIG.whatsappUrl, "_blank", "noopener");
+    hasClickedJoin = true;
+    $("gateHint").textContent = "Waiting for you to come back from WhatsApp…";
+  });
+
+  // Unlock only activates once the person has actually left for
+  // WhatsApp and come back — detected via the tab regaining
+  // visibility/focus after the join button was tapped.
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && hasClickedJoin && !returnedFromWhatsapp) {
+      returnedFromWhatsapp = true;
+      enableUnlock();
+    }
+  });
+  window.addEventListener("focus", () => {
+    if (hasClickedJoin && !returnedFromWhatsapp) {
+      returnedFromWhatsapp = true;
+      enableUnlock();
+    }
+  });
+
+  $("unlockBtn").addEventListener("click", () => {
+    if ($("unlockBtn").disabled) return;
+    playUnlockAnimation();
+  });
+  attachRipple($("joinWhatsappBtn"));
+  attachRipple($("unlockBtn"));
+}
+
+function initDevReset() {
+  $("devResetBtn").addEventListener("click", () => {
+    if (confirm("Developer option: reset the WhatsApp unlock state on this device?")) {
+      Storage.reset();
+      location.reload();
+    }
+  });
+}
+
+/* ============================================================
+   10b. PERIODIC WHATSAPP REMINDER (full-screen, dashboard only)
+   No lock/unlock animation — that only ever plays once, on the
+   very first gate. This is a dismissible full-screen nudge that
+   repeats every CONFIG.reminder.everySeconds while the dashboard
+   is the screen currently showing.
+   ============================================================ */
+let reminderIntervalId = null;
+
+function showWaReminder() {
+  $("waReminder").classList.add("show");
+}
+
+function hideWaReminder() {
+  $("waReminder").classList.remove("show");
+}
+
+function initWaReminder() {
+  if (!CONFIG.reminder || !CONFIG.reminder.enabled) return;
+
+  $("waReminderJoin").addEventListener("click", () => {
+    window.open(CONFIG.whatsappUrl, "_blank", "noopener");
+    hideWaReminder();
+  });
+  $("waReminderLater").addEventListener("click", hideWaReminder);
+  $("waReminderClose").addEventListener("click", hideWaReminder);
+
+  // First nudge after one interval, then keep repeating — only while
+  // the dashboard screen is the one showing, and only if it isn't
+  // already up (avoids re-triggering on top of itself).
+  clearInterval(reminderIntervalId);
+  reminderIntervalId = setInterval(() => {
+    const dashboardActive = $("screenDashboard").classList.contains("active");
+    const alreadyShowing = $("waReminder").classList.contains("show");
+    if (dashboardActive && !alreadyShowing) {
+      showWaReminder();
+    }
+  }, CONFIG.reminder.everySeconds * 1000);
+}
+
+/* ============================================================
+   10. INIT
+   ============================================================ */
+document.addEventListener("DOMContentLoaded", () => {
+  mountLogo($("splashSealMount"));
+  $("splashName").textContent = CONFIG.platformName;
+  $("splashTagline").textContent = CONFIG.tagline;
+
+  initParticles();
+  initGate();
+  initDevReset();
+  initSubDashboard();
+  initContactAdmin();
+
+  const alreadyUnlocked = Storage.isUnlocked();
+
+  // Splash always plays briefly for the premium entrance, then routes
+  // based on whether this device already completed the WhatsApp gate.
+  setTimeout(() => {
+    if (alreadyUnlocked) {
+      enterDashboard();
+    } else {
+      showScreen("screenGate");
+    }
+  }, 2600);
+});
+
+</script>
+</body>
+</html>
