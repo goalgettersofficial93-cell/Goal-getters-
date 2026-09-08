@@ -984,13 +984,13 @@ a { color: inherit; }
       </svg>
     </div>
     <h1>Join Our WhatsApp Community</h1>
-    <p>Access to all batches, updates and study material is shared through our WhatsApp community. Please join before unlocking your dashboard — it only takes a moment.</p>
+    <p>Stay updated with all batches, updates and study material shared through our WhatsApp community.</p>
     <button class="btn btn-whatsapp" id="joinWhatsappBtn">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none"><path d="M12 3.2a8.8 8.8 0 0 0-7.55 13.3L3.2 20.8l4.4-1.15A8.8 8.8 0 1 0 12 3.2Z" fill="#0b3d1e"/></svg>
       JOIN WHATSAPP
     </button>
-    <button class="btn btn-unlock" id="unlockBtn" disabled>I HAVE JOINED — UNLOCK ACCESS</button>
-    <div class="gate-hint" id="gateHint">Tap "Join WhatsApp" first — unlock activates once you return.</div>
+    <button class="btn btn-unlock" id="unlockBtn">ALREADY JOINED — OPEN</button>
+    <div class="gate-hint" id="gateHint">Already part of our WhatsApp community? Tap above to continue.</div>
   </div>
 </section>
 
@@ -1748,41 +1748,17 @@ function playUnlockAnimation() {
 }
 
 function initGate() {
-  let hasClickedJoin = false;
-  let returnedFromWhatsapp = false;
-
-  function enableUnlock() {
-    const btn = $("unlockBtn");
-    btn.disabled = false;
-    $("gateHint").textContent = "Welcome back! Tap the button above to unlock.";
-  }
-
+  // Joining WhatsApp is optional — it just opens the link in a new tab.
   $("joinWhatsappBtn").addEventListener("click", () => {
     window.open(CONFIG.whatsappUrl, "_blank", "noopener");
-    hasClickedJoin = true;
-    $("gateHint").textContent = "Waiting for you to come back from WhatsApp…";
   });
 
-  // Unlock only activates once the person has actually left for
-  // WhatsApp and come back — detected via the tab regaining
-  // visibility/focus after the join button was tapped.
-  document.addEventListener("visibilitychange", () => {
-    if (!document.hidden && hasClickedJoin && !returnedFromWhatsapp) {
-      returnedFromWhatsapp = true;
-      enableUnlock();
-    }
-  });
-  window.addEventListener("focus", () => {
-    if (hasClickedJoin && !returnedFromWhatsapp) {
-      returnedFromWhatsapp = true;
-      enableUnlock();
-    }
-  });
-
+  // "Already Joined — Open" works immediately, no waiting on a
+  // return-from-WhatsApp visibility/focus check.
   $("unlockBtn").addEventListener("click", () => {
-    if ($("unlockBtn").disabled) return;
     playUnlockAnimation();
   });
+
   attachRipple($("joinWhatsappBtn"));
   attachRipple($("unlockBtn"));
 }
