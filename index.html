@@ -931,6 +931,92 @@ a { color: inherit; }
 }
 
 /* ==========================================================================
+   BROWSER / FIREFOX DANGER NOTICE — high-visibility warning variant
+   of the reminder card: red hazard stripe, pulsing warning icon,
+   bold red heading so it reads as genuinely important.
+   ========================================================================== */
+
+.danger-notice-card {
+  border: 1.5px solid rgba(177, 64, 47, 0.55) !important;
+  box-shadow: 0 0 0 1px rgba(177, 64, 47, 0.25), 0 20px 50px rgba(177, 64, 47, 0.25);
+  overflow: hidden;
+}
+
+.danger-notice-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--stamp-red),
+    var(--stamp-red) 10px,
+    #f0c477 10px,
+    #f0c477 20px
+  );
+}
+
+.danger-notice-icon {
+  width: 68px;
+  height: 68px;
+  margin: 10px auto 18px;
+  border-radius: 50%;
+  background: rgba(177, 64, 47, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  animation: dangerPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes dangerPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(177, 64, 47, 0.45); }
+  50% { box-shadow: 0 0 0 14px rgba(177, 64, 47, 0); }
+}
+
+.danger-notice-card h1 {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: var(--stamp-red);
+  text-transform: uppercase;
+  margin: 0 0 14px;
+}
+
+.danger-notice-card p {
+  font-size: 14.5px;
+  color: var(--paper-text);
+  line-height: 1.65;
+  margin: 0 0 14px;
+  text-align: left;
+}
+
+.danger-notice-card p:last-of-type { margin-bottom: 22px; }
+
+.danger-notice-card p strong {
+  color: var(--stamp-red);
+  font-weight: 700;
+}
+
+.danger-notice-card .all-the-best {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--amber-light);
+}
+
+.btn-danger-cancel {
+  background: var(--stamp-red) !important;
+  border-color: var(--stamp-red) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+}
+.btn-danger-cancel:hover { background: #932f21 !important; }
+
+
+/* ==========================================================================
    SUB-DASHBOARD — a second full-screen "dashboard" opened when a batch
    card has nested items (e.g. Maths -> individual VOD/lecture links).
    Reuses the same visual language as the main dashboard, with a Back
@@ -1156,6 +1242,22 @@ a { color: inherit; }
   </div>
 </div>
 
+<!-- Browser/Firefox notice — shown every time the dashboard is entered,
+     dismissible with the Cancel (✕) button. -->
+<div id="browserNotice" class="wa-reminder-overlay">
+  <div class="wa-reminder-card danger-notice-card">
+    <button class="wa-reminder-dismiss" id="browserNoticeClose" aria-label="Cancel">✕</button>
+    <div class="danger-notice-icon">⚠️</div>
+    <h1>⚠️ Important Notice</h1>
+    <p>Kabhi-kabhi <strong>Chrome / Browser</strong> mein video player sahi se kaam nahi karta.</p>
+    <p>✅ Isliye <strong>Firefox Browser</strong> ka use karein.<br>✅ Agar video na chale to <strong>download karke</strong> dekhein.</p>
+    <p>Agar phir bhi problem ho, to thoda dhyaan se try karein — sab set ho jayega. 🙌</p>
+    <p class="all-the-best">All the best! 🎯</p>
+    <button class="btn btn-unlock btn-danger-cancel" id="browserNoticeCancel">CANCEL</button>
+  </div>
+</div>
+
+
 <script defer>
 /* ==========================================================================
    GOAL GETTERS — MAIN SCRIPT
@@ -1199,7 +1301,7 @@ const CONFIG = {
   // These are the fixed category pills shown on the dashboard
   // (besides "All"). Give each batch below a category matching
   // one of these names.
-  categories: ["Batches", "Others", "Website"],
+  categories: ["Batches", "Mocks", "Others", "Website"],
 
   // ---- Batches ----
   // Add a new batch by adding another object to this array — the
@@ -1292,6 +1394,10 @@ const CONFIG = {
         {
           name: "Arun sir",
           url: "https://goalgettersofficial93-cell.github.io/Arun-sir/"
+        },
+        {
+          name: "Parmar reasoning",
+          url: "https://goalgettersofficial93-cell.github.io/Parmar-reasoning-/"
         }
       ]
     },
@@ -1330,10 +1436,6 @@ const CONFIG = {
         {
           name: "Banking spl-40",
           url: "https://goalgettersofficial93-cell.github.io/Banking-spl-40-/"
-        },
-        {
-          name: "Banking mock test",
-          url: "https://goalgettersofficial93-cell.github.io/Banking-mocks/"
         }
       ]
     },
@@ -1360,6 +1462,89 @@ const CONFIG = {
         {
           name: "Pratham batch",
           url: "https://goalgettersofficial93-cell.github.io/Pratham-batch-/"
+        }
+      ]
+    },
+    {
+      name: "Mocks",
+      description: "Practice mock tests and check your test ranking.",
+      category: "Mocks",
+      badge: "NEW",
+      icon: "📝",
+      items: [
+        {
+          name: "Test ranking",
+          url: "https://goalgettersofficial93-cell.github.io/Test-ranking-/"
+        },
+        {
+          name: "Banking mock test",
+          url: "https://goalgettersofficial93-cell.github.io/Banking-mocks/"
+        }
+      ]
+    },
+    {
+      name: "Computer",
+      description: "Computer batch covering fundamentals and practice for competitive exams.",
+      category: "Others",
+      badge: "NEW",
+      icon: "💻",
+      items: [
+        {
+          name: "Parmar pc 2.0",
+          url: "https://goalgettersofficial93-cell.github.io/Pc-batch-2.0/"
+        }
+      ]
+    },
+    {
+      name: "Telegram Batches",
+      description: "All Telegram batch links in one place.",
+      category: "Others",
+      badge: "NEW",
+      icon: "✈️",
+      items: [
+        {
+          name: "Simplicrack gk",
+          url: "https://t.me/+hm5PcdRxgR01N2Q1"
+        },
+        {
+          name: "Banking batches",
+          url: "https://t.me/+dv7DBArEauZkMTE1"
+        },
+        {
+          name: "Carrier will batches",
+          url: "https://t.me/+OZCXCl69JmUyNGY9"
+        },
+        {
+          name: "Up tet",
+          url: "https://t.me/+O9B9zHtAqwA3Mzhl"
+        },
+        {
+          name: "Selection way",
+          url: "https://t.me/+nUz3NjAXlXJjMzJl"
+        },
+        {
+          name: "Piyush reasoning",
+          url: "https://t.me/+EHSv4ihp3t04NDg1"
+        },
+        {
+          name: "Qeng english",
+          url: "https://t.me/+bJ-FaaoRgHthMTI1"
+        },
+        {
+          name: "Samudramanthan",
+          url: "https://t.me/+hbsKfHcfPexkMjg1"
+        },
+        {
+          name: "Parmar 4.0",
+          url: "https://t.me/+l1yJ9ckIc204YTE1"
+        },
+        {
+          name: "Rakesh yadav",
+          url: "https://t.me/+vor79N_RuzJjMDI9"
+        },
+        {
+          name: "Parmar reasoning",
+          url: "https://t.me/+WZeFnuWD46U5OGVl"
         }
       ]
     },
@@ -1731,6 +1916,7 @@ function enterDashboard() {
   initSearchAndFilters();
   initWaReminder();
   showScreen("screenDashboard");
+  showBrowserNotice();
 }
 
 function playUnlockAnimation() {
@@ -1813,6 +1999,23 @@ function initWaReminder() {
 }
 
 /* ============================================================
+   10c. BROWSER / FIREFOX NOTICE — shown every time the user
+   lands on the dashboard. Dismissed with the Cancel (✕) button.
+   ============================================================ */
+function showBrowserNotice() {
+  $("browserNotice").classList.add("show");
+}
+
+function hideBrowserNotice() {
+  $("browserNotice").classList.remove("show");
+}
+
+function initBrowserNotice() {
+  $("browserNoticeClose").addEventListener("click", hideBrowserNotice);
+  $("browserNoticeCancel").addEventListener("click", hideBrowserNotice);
+}
+
+/* ============================================================
    10. INIT
    ============================================================ */
 document.addEventListener("DOMContentLoaded", () => {
@@ -1825,6 +2028,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initDevReset();
   initSubDashboard();
   initContactAdmin();
+  initBrowserNotice();
 
   const alreadyUnlocked = Storage.isUnlocked();
 
